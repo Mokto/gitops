@@ -12,7 +12,7 @@ K8S Gitops Manager is using Kubernetes and Helm to package and deploy your appli
 
 ## Template composition
 
-Your usual values.yaml handling is adapted to Gitops. It means that you can use some built-in values like `{{.Branch}}`. They will be computed by K8S gitops manager before being packaged and installed by Tiller.
+Your usual values.yaml handling is adapted to Gitops. It means that you can use some built-in values like `{{.Branch}}` or `{{.BranchUrlSafe}}`. They will be computed by K8S gitops manager before being packaged and installed by Tiller.
 
 ## Based and webhooks
 

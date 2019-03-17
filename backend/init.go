@@ -2,30 +2,21 @@ package backend
 
 import (
 	"fmt"
-	"os"
-
-	"github.com/gin-gonic/contrib/static"
-	"github.com/gin-gonic/gin"
+	"gitops/backend/config"
+	"gitops/backend/controllers"
+	"gitops/backend/dao"
 )
 
 // Init the frontend and api backend
 func Init() {
-	fmt.Println("Run server")
-	r := gin.Default()
+	dao.InitAllTables()
 
-	if os.Getenv("GIN_MODE") == "release" {
-		r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
-		r.NoRoute(func(c *gin.Context) {
-			c.File("frontend/build/index.html")
-		})
+	repos := config.GetRepositories()
+	err := dao.InsertManyRepositories(repos)
+	if err != nil {
+		panic(err)
 	}
 
-	api := r.Group("/api")
-	{
-		InitAPI(api)
-	}
-
-	go initGithub()
-
-	r.Run(":8000")
+	err = controllers.InstallAllRepositories()
+	fmt.Println(err)
 }

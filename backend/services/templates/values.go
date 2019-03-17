@@ -2,14 +2,20 @@ package templates
 
 import (
 	"bytes"
+	"gitops/backend/utils"
 	"html/template"
 	"io/ioutil"
 	"log"
+	"strings"
 )
 
 // WriteValues replace the helm values.yaml
-func WriteValues(templateValues ValuesTemplate) (err error) {
-	tmpl, err := template.ParseFiles("/tmp/cloned-repo/app/values.yaml")
+func WriteValues(basePath string, templateValues ValuesTemplate) (err error) {
+	path := utils.ComposeStrings(basePath, "/chart/values.yaml")
+
+	templateValues.BranchUrlSafe = strings.ReplaceAll(strings.ReplaceAll(templateValues.Branch, "/", "."), "/", "-")
+
+	tmpl, err := template.ParseFiles(path)
 	if err != nil {
 		return err
 	}
@@ -18,7 +24,7 @@ func WriteValues(templateValues ValuesTemplate) (err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile("/tmp/cloned-repo/app/values.yaml", b.Bytes(), 0644)
+	err = ioutil.WriteFile(path, b.Bytes(), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,6 +34,6 @@ func WriteValues(templateValues ValuesTemplate) (err error) {
 // ValuesTemplate is the template used to replace values
 type ValuesTemplate struct {
 	Branch  string
-	Tag     string
+	BranchUrlSafe string
 	Secrets map[string]interface{}
 }

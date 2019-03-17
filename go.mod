@@ -5,6 +5,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.18.0+incompatible // indirect
+	github.com/bvinc/go-sqlite-lite v0.5.1-0.20190305204819-ef3f2270a05f
 	github.com/cespare/reflex v0.2.0 // indirect
 	github.com/codegangsta/envy v0.0.0-20141216192214-4b78388c8ce4 // indirect
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/gin-gonic/gin v1.3.0
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/protobuf v1.3.0 // indirect
+	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v24 v24.0.1
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/howeyc/fsnotify v0.9.0 // indirect
@@ -26,6 +28,7 @@ require (
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.6 // indirect
 	github.com/mattn/go-shellwords v1.0.5 // indirect
+
 	github.com/ogier/pflag v0.0.1 // indirect
 	github.com/pilu/config v0.0.0-20131214182432-3eb99e6c0b9a // indirect
 	github.com/pilu/fresh v0.0.0-20170301142741-9c0092493eff // indirect

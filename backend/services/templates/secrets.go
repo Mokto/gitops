@@ -2,15 +2,17 @@ package templates
 
 import (
 	"bufio"
+	"gitops/backend/utils"
 	"os"
 	"strings"
 )
 
 // GetSecrets return the list of decrypted secrets
-func GetSecrets() (secrets map[string]interface{}, err error) {
-	secrets = map[string]interface{}{}
+func GetSecrets(basePath string) (secrets map[string]interface{}, err error) {
+	repositoryPath := utils.ComposeStrings(basePath , "/secrets.yaml")
 
-	file, err := os.Open("/tmp/cloned-repo/secrets.yaml")
+	secrets = map[string]interface{}{}
+	file, err := os.Open(repositoryPath)
 	if err != nil {
 		return nil, err
 	}

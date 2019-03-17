@@ -2,6 +2,8 @@ package config
 
 import (
 	"errors"
+	"gitops/backend/models"
+	"gitops/backend/utils"
 	"os"
 	"strconv"
 	"strings"
@@ -9,16 +11,7 @@ import (
 
 type Config struct {
 	GithubPAT string
-	Repositories []Repository
 }
-
-type Repository struct {
-	Type string
-	Organization string
-	Name string
-	FullName string
-}
-
 
 func Get() (config Config) {
 	pat := os.Getenv("GITHUB_PAT")
@@ -26,13 +19,14 @@ func Get() (config Config) {
 		panic(errors.New("No Github PAT passed."))
 	}
 	config.GithubPAT = pat
+	return
+}
 
+func GetRepositories() (repositories []models.Repository) {
 	i := 1
 	for i != -1 {
-		var envText strings.Builder
-		envText.WriteString("GIT_REPO")
-		envText.WriteString(strconv.Itoa(i))
-		repo := os.Getenv(envText.String())
+		envText := utils.ComposeStrings("GIT_REPO", strconv.Itoa(i))
+		repo := os.Getenv(envText)
 
 		if repo == "" {
 			i = -1
@@ -41,15 +35,15 @@ func Get() (config Config) {
 
 		splitedRepo := strings.Split(repo, "/")
 
-		repository := Repository{
+		repository := models.Repository{
 			FullName: repo,
 			Name: splitedRepo[1],
 			Organization: splitedRepo[0],
 			Type: "github",
 		}
 
-		config.Repositories = append(config.Repositories, repository)
+		repositories = append(repositories, repository)
 		i++
 	}
-	return
+	return repositories
 }
