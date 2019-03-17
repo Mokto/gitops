@@ -1,11 +1,13 @@
 package dao
 
 import (
+	"fmt"
 	"gitops/backend/db"
 	"gitops/backend/models"
+	"gitops/backend/utils"
 )
 
-func initRepositoryTable() (error) {
+func initRepositoryTable() error {
 	conn, err := db.GetConnection()
 	if err != nil {
 		return err
@@ -15,16 +17,22 @@ func initRepositoryTable() (error) {
 	if err != nil {
 		return err
 	}
-	err = conn.Exec(`CREATE TABLE repositories(type TEXT, organization TEXT, name TEXT, fullName TEXT)`)
+	err = conn.Exec(`CREATE TABLE repositories(
+		id TEXT PRIMARY KEY,
+		type TEXT,
+		organization TEXT,
+		name TEXT,
+		fullName TEXT
+	)`)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func InsertManyRepositories(repositories []models.Repository) (err error) {
-	for _, repository := range repositories {
-		err := InsertOneRepository(repository)
+func InsertManyRepositories(repositories *[]models.Repository) (err error) {
+	for i := range *repositories {
+		err := InsertOneRepository(&(*repositories)[i])
 		if err != nil {
 			return err
 		}
@@ -32,28 +40,29 @@ func InsertManyRepositories(repositories []models.Repository) (err error) {
 	return
 }
 
-func InsertOneRepository(repo models.Repository) (err error) {
+func InsertOneRepository(repo *models.Repository) (err error) {
 	conn, err := db.GetConnection()
-	defer conn.Close()
 	if err != nil {
 		return err
 	}
-	err = conn.Exec(`INSERT INTO repositories VALUES (?, ?, ?, ?)`, repo.Type, repo.Organization, repo.Name, repo.FullName)
+	defer conn.Close()
+
+	repo.ID = utils.ComposeStrings(repo.Type, "/", repo.FullName)
+	err = conn.Exec(`INSERT INTO repositories(id, type, organization, name, fullName) VALUES (?, ?, ?, ?, ?)`, repo.ID, repo.Type, repo.Organization, repo.Name, repo.FullName)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-
 func FindAllRepositories() (repositories []models.Repository, err error) {
 	conn, err := db.GetConnection()
-	defer conn.Close()
 	if err != nil {
 		return nil, err
 	}
-	// Prepare can prepare a statement and optionally also bind arguments
-	stmt, err := conn.Prepare(`SELECT type, organization, name, fullName FROM repositories`)
+	defer conn.Close()
+
+	stmt, err := conn.Prepare(`SELECT id, type, organization, name, fullName FROM repositories`)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +79,8 @@ func FindAllRepositories() (repositories []models.Repository, err error) {
 		}
 
 		repository := models.Repository{}
-		err = stmt.Scan(&repository.Type, &repository.Organization, &repository.Name, &repository.FullName)
+		err = stmt.Scan(&repository.ID, &repository.Type, &repository.Organization, &repository.Name, &repository.FullName)
+		fmt.Println(repository)
 		if err != nil {
 			return nil, err
 		}

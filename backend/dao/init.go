@@ -1,6 +1,14 @@
 package dao
 
-func InitAllTables() {
-	initRepositoryTable()
-}
+import "fmt"
 
+func InitAllTables() {
+	err := initRepositoryTable()
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = initBranchTable()
+	if err != nil {
+		fmt.Println(err)
+	}
+}

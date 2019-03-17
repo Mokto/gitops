@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	githubApi "github.com/google/go-github/v24/github"
 	"gitops/backend/dao"
 	"gitops/backend/models"
 	"gitops/backend/services/github"
@@ -11,7 +10,7 @@ import (
 	"gitops/backend/utils"
 )
 
-func InstallAllRepositories() (err error){
+func InstallAllRepositories() (err error) {
 	repositories, err := dao.FindAllRepositories()
 	if err != nil {
 		return err
@@ -27,13 +26,10 @@ func InstallAllRepositories() (err error){
 }
 
 func InstallRepository(repository models.Repository) (err error) {
-	fmt.Println(repository.Name)
-
-	branches, err := github.GetBranches(repository.Organization, repository.Name)
+	branches, err := dao.FindAllBranchesByRepository(repository.ID)
 	if err != nil {
 		return err
 	}
-
 
 	for _, branch := range branches {
 		err = InstallRepositoryBranch(repository, branch)
@@ -45,7 +41,7 @@ func InstallRepository(repository models.Repository) (err error) {
 	return
 }
 
-func InstallRepositoryBranch(repository models.Repository, branch *githubApi.Branch) (err error) {
+func InstallRepositoryBranch(repository models.Repository, branch models.Branch) (err error) {
 	_, path, err := github.CloneRepo(repository, branch)
 	if err != nil {
 		fmt.Println(err)
@@ -58,7 +54,7 @@ func InstallRepositoryBranch(repository models.Repository, branch *githubApi.Bra
 		return
 	}
 	templateValues := templates.ValuesTemplate{
-		Branch:  branch.GetName(),
+		Branch:  branch.Name,
 		Secrets: secrets,
 	}
 	err = templates.WriteValues(path, templateValues)
@@ -69,8 +65,8 @@ func InstallRepositoryBranch(repository models.Repository, branch *githubApi.Bra
 	fmt.Println("Done writing file")
 	//
 
-	releaseName := utils.ComposeStrings("todelete-", branch.GetName())
-	namespace := utils.ComposeStrings("ops-", branch.GetName())
+	releaseName := utils.ComposeStrings("todelete-", branch.Name)
+	namespace := utils.ComposeStrings("ops-", branch.Name)
 
 	err = helm.InstallOrUpgradeRelease(path, releaseName, namespace)
 

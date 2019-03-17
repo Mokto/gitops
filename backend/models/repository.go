@@ -1,8 +1,9 @@
 package models
 
 type Repository struct {
-	Type string
+	ID           string
+	Type         string
 	Organization string
-	Name string
-	FullName string
+	Name         string
+	FullName     string
 }

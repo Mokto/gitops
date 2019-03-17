@@ -19,7 +19,7 @@ require (
 	github.com/golang/protobuf v1.3.0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-github/v24 v24.0.1
-	github.com/google/uuid v1.1.1 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/howeyc/fsnotify v0.9.0 // indirect
 	github.com/huandu/xstrings v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
